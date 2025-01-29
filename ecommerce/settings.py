@@ -31,6 +31,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,10 +40,23 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+
     'home',
+    'accounts',
+    'product',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+
+    'widget_tweaks',
+
 ]
 
 MIDDLEWARE = [
+    
+    "allauth.account.middleware.AccountMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -49,14 +64,41 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+
 ]
+
+# Provider specific settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        # credentials, or list them here:
+        'APP': {
+            'client_id': '233071876522-mfpje6625e60hes05b0nk5n7d6m4uub8.apps.googleusercontent.com',
+            'secret': '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',
+            'key': ''
+        },
+        "settings": {
+            # You can fine tune these settings per app:
+            "scope": [
+                "profile",
+                "email",
+                ],
+                "auth_params": {
+                    "access_type": "online",
+            },
+        },
+    },
+}
+
+LOGIN_REDIRECT_URL =  'home'
+
 
 ROOT_URLCONF = 'ecommerce.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -123,3 +165,16 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Ecomerce Admin",
+    "site_header": "Ecommerce",
+    "site_brand": "Ecommerce",
+    "welcome_sign": "Welcome to the ecomerce website",
+    "copyright": "Acme Library Ltd",
+}
