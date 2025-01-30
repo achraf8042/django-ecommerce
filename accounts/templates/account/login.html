@@ -1,0 +1,81 @@
+{% extends "home/base.html" %}
+{% load i18n allauth account widget_tweaks %}
+{% load socialaccount %}
+
+{% block head_title %}
+    {% trans "Sign In" %}
+{% endblock head_title %}
+
+{% block content %}
+<div class="container min-vh-100 d-flex align-items-center justify-content-center">
+    <div class="text-center" style="max-width: 300px; width: 100%; padding: 0 15px;">
+        <h1 class="h3 mb-4 font-weight-normal">
+            {% trans "Sign In" %}
+        </h1>
+
+        {% if not SOCIALACCOUNT_ONLY %}
+            <p class="mb-4">
+                {% blocktranslate %}If you have not created an account yet, then please <a href="{{ signup_url }}">sign up</a> first.{% endblocktranslate %}
+            </p>
+
+            <form method="post" action="{% url 'account_login' %}" class="mb-4">
+                {% csrf_token %}
+                
+                {% for field in form %}
+                    <div class="form-group mb-3">
+                        {{ field|add_class:"form-control form-control-lg" }}
+                        {% if field.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ field.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                {% if redirect_field_value %}
+                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                {% endif %}
+
+                <button type="submit" class="btn btn-lg btn-primary w-100 mb-3">
+                    {% trans "Sign In" %}
+                </button>
+            </form>
+        {% endif %}
+
+        {% if LOGIN_BY_CODE_ENABLED or PASSKEY_LOGIN_ENABLED %}
+            <hr class="my-4">
+            <div class="d-grid gap-2">
+                {% if PASSKEY_LOGIN_ENABLED %}
+                    <button type="submit" form="mfa_login" id="passkey_login" class="btn btn-lg btn-outline-primary">
+                        {% trans "Sign in with a passkey" %}
+                    </button>
+                {% endif %}
+                {% if LOGIN_BY_CODE_ENABLED %}
+                    <a href="{{ request_login_code_url }}" class="btn btn-lg btn-outline-primary">
+                        {% trans "Mail me a sign-in code" %}
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {% if SOCIALACCOUNT_ENABLED %}
+            <div class="mt-4">
+                <hr class="my-4">
+                <h6 class="text-muted mb-3">{% trans "Or sign in with" %}</h6>
+                <div class="socialaccount_ballot">
+                    <div class="socialaccount_providers">
+                        {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_body %}
+    {{ block.super }}
+    {% if PASSKEY_LOGIN_ENABLED %}
+        {% include "mfa/webauthn/snippets/login_script.html" with button_id="passkey_login" %}
+    {% endif %}
+{% endblock %}

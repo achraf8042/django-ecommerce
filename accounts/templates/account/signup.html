@@ -1,0 +1,65 @@
+{% extends "home/base.html" %}
+{% load allauth i18n widget_tweaks %}
+{% load socialaccount %}
+
+{% block title %}
+    {% trans "Signup" %}
+{% endblock title %}
+
+{% block content %}
+<div class="container min-vh-100 d-flex align-items-center justify-content-center">
+    <div class="text-center" style="max-width: 300px; width: 100%; padding: 0 15px;">
+        <h1 class="h3 mb-4 font-weight-normal">
+            {% trans "Sign Up" %}
+        </h1>
+        
+        <p class="mb-4">
+            {% blocktranslate %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktranslate %}
+        </p>
+
+        {% if not SOCIALACCOUNT_ONLY %}
+            {% url 'account_signup' as action_url %}
+            <form method="post" action="{{ action_url }}" class="mb-3">
+                {% csrf_token %}
+                
+                {% for field in form %}
+                    <div class="form-group mb-3">
+                        {{ field|add_class:"form-control form-control-lg" }}
+                        {% if field.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ field.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                
+                {% if redirect_field_value %}
+                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                {% endif %}
+                
+                <button type="submit" class="btn btn-lg btn-primary w-100 mb-3">
+                    {% trans "Sign Up" %}
+                </button>
+            </form>
+        {% endif %}
+
+        {% if PASSKEY_SIGNUP_ENABLED %}
+            <hr class="my-4">
+            <a href="{{ signup_by_passkey_url }}" class="btn btn-lg btn-outline-primary w-100 mb-3">
+                {% trans "Sign up using a passkey" %}
+            </a>
+        {% endif %}
+
+        {% if SOCIALACCOUNT_ENABLED %}
+            <div class="mt-4">
+                <h6 class="text-muted mb-3">{% trans "Or sign up with" %}</h6>
+                <div class="socialaccount_ballot">
+                    <div class="socialaccount_providers">
+                        {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}
